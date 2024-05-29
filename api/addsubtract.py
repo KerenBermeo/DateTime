@@ -4,7 +4,35 @@ from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
-@router.get("/addsubtract/")
+@router.get("/addsubtract/", response_model=dict, responses={
+    200: {"description": "Successful response", "content": {"application/json": {"example": {"original": "2021-05-31T00:00:00", "amount": 5, "unit": "days", "result": "2021-06-05T00:00:00"}}}},
+    422: {"description": "Validation Error", "content": {"application/json": {
+    "example": {
+        "detail": [
+            {
+                "loc": ["query", "date_str"],
+                "msg": "Invalid date format. Expected 'YYYY-MM-DD'.",
+                "type": "value_error"
+            },
+            {
+                "loc": ["query", "amount"],
+                "msg": "Amount must be an integer or float.",
+                "type": "value_error"
+            },
+            {
+                "loc": ["query", "operation"],
+                "msg": "Operation must be 'add' or 'subtract'.",
+                "type": "value_error"
+            },
+            {
+                "loc": ["query", "unit"],
+                "msg": "Unit must be 'days', 'weeks', or 'years'.",
+                "type": "value_error"
+            }
+        ]
+    }
+}}}
+})
 def add_subtract_time(date_str: str, amount: Union[int, float], unit: str, operation: str) -> dict:
     """
     Add or subtract a specified amount of time (days, weeks, or years) from a given date.
