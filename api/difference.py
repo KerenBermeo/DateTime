@@ -48,7 +48,7 @@ def difference_data_time(start_date: str, start_time: str, end_date: str, end_ti
         start = datetime.strptime(start_str, "%Y-%m-%dT%H:%M:%S")
         end = datetime.strptime(end_str, "%Y-%m-%dT%H:%M:%S")
     except ValueError:
-            raise HTTPException(status_code=422, detail="Formato de fecha u hora inválido. Se esperaba 'YYYY-MM-DD' para la fecha y 'HH:MM:SS' para la hora.")
+            raise HTTPException(status_code=422, detail="Invalid date or time format. Expected 'YYYY-MM-DD' for date and 'HH:MM:SS' for time.")
     
     # Calcula la diferencia
     difference = start - end

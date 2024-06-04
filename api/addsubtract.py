@@ -53,19 +53,19 @@ def add_subtract_time(date_str: str, amount: Union[int, float], unit: str, opera
         # Convertir el string de fecha a un objeto datetime
         date = datetime.strptime(date_str, "%Y-%m-%d")
     except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid date format. Expected 'YYYY-MM-DD'.")
+        raise HTTPException(status_code=422, detail="Invalid date format. Expected 'YYYY-MM-DD'.")
 
     # Asegurarse de que el amount es un número
     try:
         num = int(amount)
     except ValueError:
-        raise HTTPException(status_code=400, detail="Amount must be an integer or float.")
+        raise HTTPException(status_code=422, detail="Amount must be an integer or float.")
 
     # Validar operación y unidad
     if operation not in ["add", "subtract"]:
-        raise HTTPException(status_code=400, detail="Operation must be 'add' or 'subtract'.")
+        raise HTTPException(status_code=422, detail="Operation must be 'add' or 'subtract'.")
     if unit not in ["days", "weeks", "years"]:
-        raise HTTPException(status_code=400, detail="Unit must be 'days', 'weeks', or 'years'.")
+        raise HTTPException(status_code=422, detail="Unit must be 'days', 'weeks', or 'years'.")
 
     if unit == "days":
         delta = timedelta(days=num)

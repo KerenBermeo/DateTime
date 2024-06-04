@@ -44,7 +44,7 @@ def current_time(date: str, time: str):
         # Convertir la fecha y hora ingresadas por el cliente a un objeto datetime
         input_datetime = datetime.fromisoformat(datetime_str)
     except ValueError:
-        raise HTTPException(status_code=400, detail="Formato de fecha y hora inválido. Se esperaba 'YYYY-MM-DDTHH:MM:SS'.")
+        raise HTTPException(status_code=422, detail="Invalid date and time format. Expected 'YYYY-MM-DD' for date and 'HH:MM:SS' for time.")
 
     # Convertir la fecha y hora a formatos solicitados
     unix_time = int(input_datetime.timestamp()) * 1000  # Convertir a milisegundos

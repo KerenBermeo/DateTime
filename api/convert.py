@@ -63,14 +63,14 @@ def convert_timezone(date: str, time: str, from_timezone: str, to_timezone: str)
         datetime_str = f"{date}T{time}"
         naive_datetime = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S")
     except ValueError:
-        raise HTTPException(status_code=422, detail="Formato de fecha u hora inválido. Se esperaba 'YYYY-MM-DD' para la fecha y 'HH:MM:SS' para la hora.")
+        raise HTTPException(status_code=422, detail="Invalid date or time format. Expected 'YYYY-MM-DD' for date and 'HH:MM:SS' for time.")
 
     try:
         # Obtener los objetos de zona horaria
         source_timezone = pytz.timezone(from_timezone)
         target_timezone = pytz.timezone(to_timezone)
     except pytz.UnknownTimeZoneError:
-        raise HTTPException(status_code=422, detail="Zona horaria inválida.")
+        raise HTTPException(status_code=422, detail="Invalid time zone.")
 
     # Asociar la zona horaria original al objeto datetime
     source_datetime = source_timezone.localize(naive_datetime)

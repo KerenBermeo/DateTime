@@ -30,10 +30,10 @@ def day_of_week(date_str: str) -> dict:
     try:
         date = datetime.strptime(date_str, "%Y-%m-%d")
         day = date.weekday()
-        days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         name_day_of_week = days[day]
     except ValueError:
-        raise HTTPException(status_code=400, detail="Formato de fecha inválido. Se esperaba 'YYYY-MM-DD' para la fecha.")
+        raise HTTPException(status_code=422, detail="Invalid date format. 'YYYY-MM-DD' was expected for the date.")
 
     return {
     "date": date,
