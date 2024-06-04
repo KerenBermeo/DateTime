@@ -5,7 +5,7 @@ router = APIRouter()
 
 @router.get("/dayofweek/", response_model=dict, responses={
     200: {"description": "Successful response", "content": {"application/json": {"example": {"date": "2024-05-28", "day_of_week": "Lunes"}}}},
-    422: {"description": "Bad Request", "content": {"application/json": {"example": {"detail": "Formato de fecha inválido. Se esperaba 'YYYY-MM-DD' para la fecha."}}}}
+    422: {"description": "Bad Request", "content": {"application/json": {"example": {"detail": "Invalid date format. 'YYYY-MM-DD' was expected for the date."}}}}
 })
 def day_of_week(date_str: str) -> dict:
 
