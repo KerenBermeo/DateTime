@@ -4,7 +4,7 @@ from datetime import datetime
 router = APIRouter()
 
 @router.get("/weeknumber_iso/", response_model=dict, responses={
-    200: {"description": "Successful response", "content": {"application/json": {"example": {"date_str": "2024-05-29"}}}},
+    200: {"description": "Successful response", "content": {"application/json": {"example": {"date": "2021-05-31","week_number": 22}}}},
     422: {"description": "Validation Error", "content":{"application/json": {
         "example": {
             "detail": [
