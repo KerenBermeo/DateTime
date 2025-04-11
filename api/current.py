@@ -1,61 +1,64 @@
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
+from typing import Optional
 
 router = APIRouter()
 
-
-@router.get("/current/", response_model=dict, responses={
-    200: {"description": "Successful response", "content": {"application/json": {"example": {"unix": 1717002000000, "utc": "Wed, 29 May 2024 12:00:00 GMT", "iso": "2024-05-29T12:00:00Z", "locale": "May 29, 2024, 12:00:00"}}}},
-    422: {"description": "Validation Error", "content":{"application/json": {
+@router.get("/format-datetime/", response_model=dict, responses={
+    200: {"description": "Successful response", "content": {"application/json": {"example": {
+        "unix_ms": 1717002000000,
+        "utc_format": "Wed, 29 May 2024 12:00:00 GMT",
+        "iso_8601": "2024-05-29T12:00:00",
+        "locale_format": "May 29, 2024, 12:00:00"
+    }}}},
+    422: {"description": "Validation Error", "content": {"application/json": {
         "example": {
-            "detail": [
-                {
-                    "loc": ["query", "date"],
-                    "msg": "Invalid date and time format. 'YYYY-MM-DDTHH:MM:SS' expected.",
-                    "type": "value_error"
-                }
-            ]
+            "detail": "Invalid datetime format. Expected 'YYYY-MM-DD' for date and 'HH:MM:SS' for time."
         }
     }}}
 })
-def current_time(date: str, time: str):
+def format_datetime(
+    date: str, 
+    time: str,
+    timezone: Optional[str] = None
+) -> dict:
     """
-    Returns the current date and time in different formats based on the input provided by the client.
+    Converts a given date and time to multiple standard formats.
 
     Parameters:
-    - date (str): The date in 'YYYY-MM-DD' format.
-    - time (str): The time in 'HH:MM:SS' format.
+    - date (str): Date in 'YYYY-MM-DD' format.
+    - time (str): Time in 'HH:MM:SS' format.
+    - timezone (Optional[str]): IANA timezone (e.g., 'America/New_York'). Not yet implemented.
 
     Returns:
-    - dict: A dictionary containing the current date and time in various formats.
+        dict: Converted datetime in formats:
+            - unix_ms: Unix timestamp in milliseconds
+            - utc_format: RFC 1123 format (e.g., 'Wed, 29 May 2024 12:00:00 GMT')
+            - iso_8601: ISO 8601 format without timezone (e.g., '2024-05-29T12:00:00')
+            - locale_format: Locale-friendly format (e.g., 'May 29, 2024, 12:00:00')
 
-    Usage Example:
-    To get the current date and time in different formats:
-    ```
-    /current/?date=2024-05-31&time=12:00:00
-    ```
-
-    Raises:
-    - HTTPException: If the date or time format is incorrect.
-
+    Example:
+        /format-datetime/?date=2024-05-29&time=12:00:00
     """
     try:
-        datetime_str = f"{date}T{time}"
-        # Convertir la fecha y hora ingresadas por el cliente a un objeto datetime
-        input_datetime = datetime.fromisoformat(datetime_str)
+        # Validación estricta del formato
+        dt = datetime.strptime(f"{date}T{time}", "%Y-%m-%dT%H:%M:%S")
     except ValueError:
-        raise HTTPException(status_code=422, detail="Invalid date and time format. Expected 'YYYY-MM-DD' for date and 'HH:MM:SS' for time.")
+        raise HTTPException(
+            status_code=422,
+            detail="Invalid datetime format. Expected 'YYYY-MM-DD' for date and 'HH:MM:SS' for time."
+        )
 
-    # Convertir la fecha y hora a formatos solicitados
-    unix_time = int(input_datetime.timestamp()) * 1000  # Convertir a milisegundos
-    utc_time = input_datetime.strftime("%a, %d %b %Y %H:%M:%S GMT")
-    iso_time = input_datetime.strftime("%Y-%m-%dT%H:%M:%SZ")
-    locale_time = input_datetime.strftime("%b %d, %Y, %H:%M:%S")
+    # TODO: Implementar manejo de timezone si se necesita
+    if timezone:
+        raise HTTPException(
+            status_code=501,
+            detail="Timezone support is not yet implemented."
+        )
 
-    # Devolver los resultados en un diccionario
     return {
-        "unix": unix_time,
-        "utc": utc_time,
-        "iso": iso_time,
-        "locale": locale_time
+        "unix_ms": int(dt.timestamp()) * 1000,
+        "utc_format": dt.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+        "iso_8601": dt.isoformat(),
+        "locale_format": dt.strftime("%b %d, %Y, %H:%M:%S")
     }

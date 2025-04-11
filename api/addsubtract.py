@@ -39,7 +39,7 @@ def add_subtract_time(date_str: str, amount: Union[int, float], unit: str, opera
 
     Parameters:
     - date_str (str): The base date in the format 'YYYY-MM-DD'.
-    - amount (Union[int, float]): The amount of time to add or subtract.
+    - amount (Union[int, float]): The amount of time to add or subtract (can be integer or float for days/weeks).
     - unit (str): The unit of time to add or subtract (days, weeks, or years).
     - operation (str): The operation to perform. Must be 'add' or 'subtract'.
 
@@ -55,9 +55,9 @@ def add_subtract_time(date_str: str, amount: Union[int, float], unit: str, opera
     except ValueError:
         raise HTTPException(status_code=422, detail="Invalid date format. Expected 'YYYY-MM-DD'.")
 
-    # Asegurarse de que el amount es un número
+    # Validar que amount sea un número (int o float)
     try:
-        num = int(amount)
+        num = float(amount)
     except ValueError:
         raise HTTPException(status_code=422, detail="Amount must be an integer or float.")
 
@@ -74,18 +74,16 @@ def add_subtract_time(date_str: str, amount: Union[int, float], unit: str, opera
     elif unit == "years":
         try:
             new_year = date.year + num if operation == "add" else date.year - num
-            result_date = date.replace(year=new_year)
+            # Asegurarnos de que el año sea un entero
+            result_date = date.replace(year=int(new_year))
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid date operation resulting in an invalid date.")
     else:
-        delta = None  # This line should never be reached because of the earlier validation check for unit
+        delta = None  # Nunca se alcanzará por la validación anterior
 
-    # For 'days' and 'weeks', apply the delta directly
+    # Para 'days' y 'weeks', aplicar el delta directamente
     if unit in ["days", "weeks"]:
-        if operation == "add":
-            result_date = date + delta
-        else:  # operation == "subtract"
-            result_date = date - delta
+        result_date = date + delta if operation == "add" else date - delta
 
     # Formatear las fechas como ISO 8601
     original_date_iso = date.isoformat()
@@ -93,7 +91,7 @@ def add_subtract_time(date_str: str, amount: Union[int, float], unit: str, opera
 
     return {
         "original": original_date_iso,
-        "amount": amount,
+        "amount": num if num.is_integer() else num,  # Devuelve int si es .0
         "unit": unit,
         "result": result_date_iso
     }
